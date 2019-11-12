@@ -33,12 +33,14 @@
                     if(node.hasAttribute("v-text")){
                         //添加订阅者
                         let attrVal = node.getAttribute("v-text");
-                        this._directive[attrVal].push(new Watcher(node,this,attrVal,'innerHTML'))
-                    }
-                    if(node.hasAttribute("v-model")){
+                        this._directive[attrVal].push(new Watcher(node,this,attrVal,'innerHTML'));
                         
                     }
+                    if(node.hasAttribute("v-model")){
+
+                    }
                 }
+                console.log(33,this._directive);
             }
         }
         
