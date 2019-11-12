@@ -12,22 +12,48 @@
                 this.options = options;
                 this.$data = options.data;//获取数据
                 this.$el = document.querySelector(options.el);//获取对象
+                this._directive={};//容器 存放订阅者
                 this.Observer(this.$data);
                 this.Compile(this.$el);
             }
             //劫持数据
             Observer(data){
-
+                for(let key in data){
+                    this._directive[key] = [];
+                }
             }
             //解析指令
             Compile(el){
                 let nodes = el.children;
+                for(let i=0;i<nodes.length;i++){
+                    let node=nodes[i];
+                    if(node.children.length){
+                        this.Compile(node)
+                    }
+                    if(node.hasAttribute("v-text")){
+                        //添加订阅者
+                        let attrVal = node.getAttribute("v-text");
+                        this._directive[attrVal].push(new Watcher(node,this,attrVal,'innerHTML'))
+                    }
+                    if(node.hasAttribute("v-model")){
+
+                    }
+                }
             }
         }
         
         //订阅者
-        class Watcher{
-
+        class Watcher{//主要的功能是更新视图
+            constructor(el,vm,exp,attr){
+                this.el = el;
+                this.vm = vm;
+                this.exp = exp;
+                this.attr = attr;
+                this.update();//初始化视图
+            }
+            update(){
+                this.el[this.attr] = this.vm.$data[this.exp];
+            }
         }
     </script>
 </head>
