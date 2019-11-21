@@ -20,6 +20,22 @@
             Observer(data){
                 for(let key in data){
                     this._directive[key] = [];
+                    let Val=data[key];
+                    let watch = this._directive[key];
+                    // this.$data对象里面的每一个属性发生赋值  都要更新视图
+                    Object.defineProperty(this.$data,key,{
+                        get : function(){
+                            return Val
+                        },
+                        set : function(newValue){
+                            if(newValue!==Val){ //当新值不等于老值  更新视图
+                                Val=newValue;
+                                watch.forEach((element)=>{
+                                    element.update()
+                                })
+                            }
+                        }
+                    });
                 }
             }
             //解析指令
@@ -34,22 +50,27 @@
                         //添加订阅者
                         let attrVal = node.getAttribute("v-text");
                         this._directive[attrVal].push(new Watcher(node,this,attrVal,'innerHTML'));
-                        
+                       
                     }
                     if(node.hasAttribute("v-model")){
-
+                        let attrVal = node.getAttribute("v-model");
+                        this._directive[attrVal].push(new Watcher(node,this,attrVal,'value'));
+                        node.addEventListener("input",()=>{
+                            this.$data[attrVal]=node.value;
+                            // this.Compile(this.$el);
+                        })
                     }
                 }
-                console.log(33,this._directive);
+                console.log(44,this._directive);
             }
         }
         
         //订阅者
         class Watcher{//主要的功能是更新视图
             constructor(el,vm,exp,attr){
-                this.el = el;
+                this.el = el; //绑定的元素
                 this.vm = vm;
-                this.exp = exp;
+                this.exp = exp; //对应的data的绑定值
                 this.attr = attr;
                 this.update();//初始化视图
             }
